@@ -69,8 +69,11 @@ export default function WinPage() {
         transition={{ duration: 0.3 }}
         className="mx-auto max-w-md space-y-6"
       >
+        <p className="text-center font-body text-sm uppercase tracking-widest text-[var(--text-secondary)]">
+          And the winner is…
+        </p>
         <h1
-          className="font-display text-3xl font-bold text-center"
+          className="font-display text-4xl font-bold text-center"
           style={{ color: config.color }}
         >
           {config.title}
