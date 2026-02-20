@@ -43,7 +43,12 @@ export default function EliminationPage() {
   };
 
   if (!eliminated) {
-    router.replace('/game');
+    // If we're in mrwhite phase, we're transitioning to guess screen — don't send user to /game
+    if (gamePhase === 'mrwhite') {
+      router.replace('/mrwhite');
+    } else {
+      router.replace('/game');
+    }
     return null;
   }
 
