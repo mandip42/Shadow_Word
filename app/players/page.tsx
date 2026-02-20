@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useGameStore } from '@/store/gameStore';
 
-const SUGGESTED_NAMES = ['Harry', 'Hermione', 'Ron', 'Draco', 'Luna', 'Neville', 'Ginny', 'Fred', 'George', 'Sirius', 'Dumbledore', 'Snape', , 'Voldemort','McGonagall', 'Hagrid', 'Dobby'];
+const SUGGESTED_NAMES = ['Harry', 'Hermione', 'Ron', 'Draco', 'Luna', 'Neville', 'Ginny', 'Fred', 'George', 'Sirius', 'Dumbledore', 'Snape', 'Voldemort','McGonagall', 'Hagrid', 'Dobby'];
 
 const pageVariants = {
   initial: { opacity: 0, y: 20, scale: 0.98 },
