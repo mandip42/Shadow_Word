@@ -269,7 +269,8 @@ export const useGameStore = create<GameState & GameActions>()(
         // Clear so next elimination round shows the newly eliminated player, not this one
         const clearLastEliminated = { lastEliminatedId: null as string | null };
         if (player.role === 'ghost') {
-          // Don't clear lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /ghost loads
+          // Eliminating Ghost is never game over: Ghost gets to guess; if Spy exist, game continues after (see submitGhostGuess).
+          // Don't clear lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /ghost loads.
           set({
             gamePhase: 'ghost',
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],

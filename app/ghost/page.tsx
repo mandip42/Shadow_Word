@@ -22,7 +22,13 @@ export default function GhostPage() {
 
   const handleSubmit = useCallback(() => {
     submitGhostGuess(guess.trim());
-    router.push('/win');
+    // Only go to win screen if game ended; if Spy still exist, game continues to next round
+    const { gamePhase } = useGameStore.getState();
+    if (gamePhase === 'ended') {
+      router.push('/win');
+    } else {
+      router.push('/game');
+    }
   }, [guess, submitGhostGuess, router]);
 
   return (
