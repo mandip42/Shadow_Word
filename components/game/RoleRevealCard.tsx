@@ -80,7 +80,8 @@ export function RoleRevealCard({ player, onSeen, autoHideSeconds = 4 }: RoleReve
             <span className="font-body text-sm text-[var(--text-secondary)]">
               {player.name}
             </span>
-            <RoleBadge role={player.role} />
+            {/* Undercover sees "Citizen" + their word so they don't know they're undercover */}
+            <RoleBadge role={player.role === 'undercover' ? 'citizen' : player.role} />
             {player.word && (
               <p className="font-display text-center text-2xl font-bold text-[var(--primary-light)]">
                 {player.word}
