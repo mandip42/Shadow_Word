@@ -29,11 +29,16 @@ export default function EliminationPage() {
   }, [eliminate]);
 
   const handleContinue = () => {
-    if (!lastEliminatedId) return;
+    if (!lastEliminatedId || !eliminated) return;
+    // Mr. White: navigate first so this page unmounts before we update store (clearing lastEliminatedId would make this page redirect to /game)
+    if (eliminated.role === 'mrwhite') {
+      router.push('/mrwhite');
+      eliminatePlayer(lastEliminatedId);
+      return;
+    }
     eliminatePlayer(lastEliminatedId);
     const nextPhase = useGameStore.getState().gamePhase;
-    if (nextPhase === 'mrwhite') router.push('/mrwhite');
-    else if (nextPhase === 'ended') router.push('/win');
+    if (nextPhase === 'ended') router.push('/win');
     else router.push('/game');
   };
 
@@ -69,9 +74,14 @@ export default function EliminationPage() {
             Word: {eliminated.word}
           </p>
         )}
+        {eliminated.role === 'mrwhite' && (
+          <p className="mt-3 text-center text-sm text-[var(--text-secondary)]">
+            Pass the phone to {eliminated.name} to guess the word!
+          </p>
+        )}
       </motion.div>
       <Button variant="primary" fullWidth onClick={handleContinue}>
-        Continue
+        {eliminated.role === 'mrwhite' ? 'Guess the word' : 'Continue'}
       </Button>
     </motion.div>
   );

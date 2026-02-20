@@ -8,6 +8,7 @@ import {
   checkCitizensWin,
   checkUndercoverWin,
   resolveWinner,
+  getAlivePlayers,
 } from '@/utils/winConditions';
 import {
   appendGameHistory,
@@ -71,6 +72,7 @@ type GameActions = {
   advanceReveal: () => void;
   castVote: (voterId: string, targetId: string) => void;
   resolveVote: () => void;
+  chooseToEliminate: (playerId: string) => void;
   checkWinCondition: () => void;
   eliminatePlayer: (playerId: string) => void;
   submitMrWhiteGuess: (guess: string) => void;
@@ -85,7 +87,7 @@ type GameActions = {
 const defaultSettings: GameSettings = {
   playerCount: 6,
   undercoverCount: 1,
-  mrWhiteEnabled: false,
+  mrWhiteEnabled: true,
   timerSeconds: 0,
   wordPackFilter: 'all',
   difficultyFilter: 'any',
@@ -217,8 +219,10 @@ export const useGameStore = create<GameState & GameActions>()(
       resolveVote() {
         const state = get();
         const votes = state.votes;
+        const alive = getAlivePlayers(state.players);
+        // Only consider alive players — never eliminate someone already out
         const tally: Record<string, number> = {};
-        state.players.forEach((p) => (tally[p.id] = 0));
+        alive.forEach((p) => (tally[p.id] = 0));
         Object.values(votes).forEach((targetId) => {
           if (tally[targetId] !== undefined) tally[targetId]++;
         });
@@ -247,11 +251,25 @@ export const useGameStore = create<GameState & GameActions>()(
         }
       },
 
+      chooseToEliminate(playerId: string) {
+        const state = get();
+        const alive = getAlivePlayers(state.players);
+        if (!alive.some((p) => p.id === playerId)) return;
+        set({
+          votes: {},
+          gamePhase: 'elimination',
+          lastEliminatedId: playerId,
+        });
+      },
+
       eliminatePlayer(playerId) {
         const state = get();
         const player = state.players.find((p) => p.id === playerId);
         if (!player) return;
+        // Clear so next elimination round shows the newly eliminated player, not this one
+        const clearLastEliminated = { lastEliminatedId: null as string | null };
         if (player.role === 'mrwhite') {
+          // Keep lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /mrwhite loads
           set({
             gamePhase: 'mrwhite',
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
@@ -267,6 +285,7 @@ export const useGameStore = create<GameState & GameActions>()(
         const { winner, reason } = resolveWinner(nextPlayers);
         if (winner) {
           set({
+            ...clearLastEliminated,
             players: nextPlayers,
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             gamePhase: 'ended',
@@ -276,6 +295,7 @@ export const useGameStore = create<GameState & GameActions>()(
           get().saveToHistory();
         } else {
           set({
+            ...clearLastEliminated,
             players: nextPlayers,
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             gamePhase: 'discussion',
@@ -305,6 +325,7 @@ export const useGameStore = create<GameState & GameActions>()(
             winner: 'mrwhite',
             winReason: reason,
           });
+          get().saveToHistory();
         } else {
           const afterElim = nextPlayers.filter((p) => !p.isEliminated);
           const { winner: w2, reason: r2 } = resolveWinner(nextPlayers);

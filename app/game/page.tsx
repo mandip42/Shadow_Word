@@ -31,10 +31,17 @@ export default function GamePage() {
   const timerSeconds = settings?.timerSeconds ?? 0;
   const currentSpeaker = alive[speakerIndex];
 
+  // Round 1: Mr. White must not be first to speak (they have no word to give a clue)
   useEffect(() => {
     if (gamePhase !== 'discussion') return;
-    setSpeakerIndex(0);
     setTimerDone(false);
+    if (currentRound === 1) {
+      const currentAlive = getAlivePlayers(useGameStore.getState().players);
+      const firstNonMrWhite = currentAlive.findIndex((p) => p.role !== 'mrwhite');
+      setSpeakerIndex(firstNonMrWhite >= 0 ? firstNonMrWhite : 0);
+    } else {
+      setSpeakerIndex(0);
+    }
   }, [gamePhase, currentRound]);
 
   const handleNextSpeaker = useCallback(() => {
@@ -103,10 +110,10 @@ export default function GamePage() {
 
       <div className="flex gap-2">
         <Button variant="ghost" fullWidth onClick={handleSkipToVote}>
-          Skip to vote
+          Skip to eliminate
         </Button>
         <Button variant="primary" fullWidth onClick={handleNextSpeaker}>
-          {speakerIndex >= alive.length - 1 ? 'Vote' : 'Next speaker'}
+          {speakerIndex >= alive.length - 1 ? 'Choose who to eliminate' : 'Next speaker'}
         </Button>
       </div>
     </motion.div>
