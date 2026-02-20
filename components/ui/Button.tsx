@@ -5,8 +5,7 @@ import { motion } from 'framer-motion';
 
 type Variant = 'primary' | 'ghost' | 'danger';
 
-// Omit animation events that conflict with Framer Motion's motion.button types
-interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd'> {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   fullWidth?: boolean;
 }
@@ -23,24 +22,29 @@ const variantStyles: Record<Variant, string> = {
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'primary', fullWidth, className = '', children, ...props }, ref) => {
     return (
-      <motion.button
-        ref={ref}
+      <motion.div
         whileTap={{ scale: 0.98 }}
         whileHover={{ scale: 1.02 }}
         transition={{ duration: 0.2 }}
-        className={`
-          min-h-[48px] min-w-[48px] rounded-xl px-6 py-3 font-body text-base font-medium
-          transition-all duration-300 ease-out
-          disabled:opacity-50 disabled:pointer-events-none
-          ${variantStyles[variant]}
-          ${fullWidth ? 'w-full' : ''}
-          ${className}
-        `}
-        style={{ fontFamily: 'var(--font-outfit), sans-serif' }}
-        {...props}
+        className={fullWidth ? 'w-full' : 'inline-block'}
       >
-        {children}
-      </motion.button>
+        <button
+          ref={ref}
+          type="button"
+          className={`
+            min-h-[48px] min-w-[48px] rounded-xl px-6 py-3 font-body text-base font-medium
+            transition-all duration-300 ease-out
+            disabled:opacity-50 disabled:pointer-events-none
+            ${variantStyles[variant]}
+            ${fullWidth ? 'w-full' : ''}
+            ${className}
+          `}
+          style={{ fontFamily: 'var(--font-outfit), sans-serif' }}
+          {...props}
+        >
+          {children}
+        </button>
+      </motion.div>
     );
   }
 );
