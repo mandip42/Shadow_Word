@@ -72,6 +72,7 @@ type GameActions = {
   advanceReveal: () => void;
   castVote: (voterId: string, targetId: string) => void;
   resolveVote: () => void;
+  chooseToEliminate: (playerId: string) => void;
   checkWinCondition: () => void;
   eliminatePlayer: (playerId: string) => void;
   submitMrWhiteGuess: (guess: string) => void;
@@ -250,12 +251,26 @@ export const useGameStore = create<GameState & GameActions>()(
         }
       },
 
+      chooseToEliminate(playerId: string) {
+        const state = get();
+        const alive = getAlivePlayers(state.players);
+        if (!alive.some((p) => p.id === playerId)) return;
+        set({
+          votes: {},
+          gamePhase: 'elimination',
+          lastEliminatedId: playerId,
+        });
+      },
+
       eliminatePlayer(playerId) {
         const state = get();
         const player = state.players.find((p) => p.id === playerId);
         if (!player) return;
+        // Clear so next elimination round shows the newly eliminated player, not this one
+        const clearLastEliminated = { lastEliminatedId: null as string | null };
         if (player.role === 'mrwhite') {
           set({
+            ...clearLastEliminated,
             gamePhase: 'mrwhite',
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             players: state.players.map((p) =>
@@ -270,6 +285,7 @@ export const useGameStore = create<GameState & GameActions>()(
         const { winner, reason } = resolveWinner(nextPlayers);
         if (winner) {
           set({
+            ...clearLastEliminated,
             players: nextPlayers,
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             gamePhase: 'ended',
@@ -279,6 +295,7 @@ export const useGameStore = create<GameState & GameActions>()(
           get().saveToHistory();
         } else {
           set({
+            ...clearLastEliminated,
             players: nextPlayers,
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             gamePhase: 'discussion',
