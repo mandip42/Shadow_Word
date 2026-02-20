@@ -14,12 +14,12 @@ const roleConfig: Record<Role, { label: string; className: string }> = {
     label: 'Citizen',
     className: 'bg-[var(--success)]/20 text-[var(--success)] border-[var(--success)]/40',
   },
-  undercover: {
-    label: 'Undercover',
+  spy: {
+    label: 'Spy',
     className: 'bg-[var(--danger)]/20 text-[var(--danger)] border-[var(--danger)]/40',
   },
-  mrwhite: {
-    label: 'Mr. White',
+  ghost: {
+    label: 'Ghost',
     className: 'bg-[var(--text-secondary)]/20 text-[var(--text-secondary)] border-[var(--border)]',
   },
 };

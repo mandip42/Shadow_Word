@@ -31,14 +31,14 @@ export default function GamePage() {
   const timerSeconds = settings?.timerSeconds ?? 0;
   const currentSpeaker = alive[speakerIndex];
 
-  // Round 1: Mr. White must not be first to speak (they have no word to give a clue)
+  // Round 1: Ghost must not be first to speak (they have no word to give a clue)
   useEffect(() => {
     if (gamePhase !== 'discussion') return;
     setTimerDone(false);
     if (currentRound === 1) {
       const currentAlive = getAlivePlayers(useGameStore.getState().players);
-      const firstNonMrWhite = currentAlive.findIndex((p) => p.role !== 'mrwhite');
-      setSpeakerIndex(firstNonMrWhite >= 0 ? firstNonMrWhite : 0);
+      const firstNonGhost = currentAlive.findIndex((p) => p.role !== 'ghost');
+      setSpeakerIndex(firstNonGhost >= 0 ? firstNonGhost : 0);
     } else {
       setSpeakerIndex(0);
     }
@@ -58,7 +58,8 @@ export default function GamePage() {
   }, [router]);
 
   if (gamePhase !== 'discussion' && gamePhase !== 'reveal') {
-    router.replace('/');
+    if (gamePhase === 'ghost') router.replace('/ghost');
+    else router.replace('/');
     return null;
   }
 

@@ -80,14 +80,14 @@ export function RoleRevealCard({ player, onSeen, autoHideSeconds = 4 }: RoleReve
             <span className="font-body text-sm text-[var(--text-secondary)]">
               {player.name}
             </span>
-            {/* Undercover sees "Citizen" + their word so they don't know they're undercover */}
-            <RoleBadge role={player.role === 'undercover' ? 'citizen' : player.role} />
+            {/* Spy sees "Citizen" + their word so they don't know they're the spy */}
+            <RoleBadge role={player.role === 'spy' ? 'citizen' : player.role} />
             {player.word && (
               <p className="font-display text-center text-2xl font-bold text-[var(--primary-light)]">
                 {player.word}
               </p>
             )}
-            {player.role === 'mrwhite' && (
+            {player.role === 'ghost' && (
               <p className="text-center text-sm text-[var(--text-secondary)]">
                 You see nothing. Guess the word when eliminated!
               </p>

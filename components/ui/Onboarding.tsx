@@ -12,11 +12,11 @@ const SLIDES = [
   },
   {
     title: 'Roles',
-    body: 'Citizens see one word. Undercover see a similar word. Mr. White sees nothing. Vote to eliminate — but don\'t vote out your own!',
+    body: 'Citizens see one word. Spy see a similar word. Ghost sees nothing. Vote to eliminate — but don\'t vote out your own!',
   },
   {
     title: 'Win',
-    body: 'Citizens win by eliminating all Undercover and Mr. White. Undercover win by reaching the final 2. Mr. White wins by guessing the word when voted out.',
+    body: 'Citizens win by eliminating all Spy and Ghost. Spy win by reaching the final 2. Ghost wins by guessing the word when voted out.',
   },
 ];
 

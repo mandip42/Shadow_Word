@@ -3,10 +3,10 @@ import { persist } from 'zustand/middleware';
 import type { WordPair } from '@/data/wordPairs';
 import { getRandomWordPair } from '@/data/wordPairs';
 import { loadCustomWordPairs } from '@/utils/storage';
-import { assignRoles as doAssignRoles, suggestedUndercoverCount } from '@/utils/roleAssignment';
+import { assignRoles as doAssignRoles, suggestedSpyCount } from '@/utils/roleAssignment';
 import {
   checkCitizensWin,
-  checkUndercoverWin,
+  checkSpyWin,
   resolveWinner,
   getAlivePlayers,
 } from '@/utils/winConditions';
@@ -21,7 +21,7 @@ import {
 export interface Player {
   id: string;
   name: string;
-  role: 'citizen' | 'undercover' | 'mrwhite';
+  role: 'citizen' | 'spy' | 'ghost';
   word: string | null;
   isEliminated: boolean;
   votes: number;
@@ -29,8 +29,8 @@ export interface Player {
 
 export interface GameSettings {
   playerCount: number;
-  undercoverCount: number;
-  mrWhiteEnabled: boolean;
+  spyCount: number;
+  ghostEnabled: boolean;
   timerSeconds: 0 | 30 | 60 | 90;
   wordPackFilter: WordCategoryFilter;
   difficultyFilter: 'easy' | 'medium' | 'hard' | 'any';
@@ -54,14 +54,14 @@ export interface GameState {
     | 'discussion'
     | 'voting'
     | 'elimination'
-    | 'mrwhite'
+    | 'ghost'
     | 'ended';
-  winner: 'citizens' | 'undercover' | 'mrwhite' | null;
+  winner: 'citizens' | 'spy' | 'ghost' | null;
   winReason: string;
   gameHistory: ReturnType<typeof loadGameHistory>;
   leaderboard: Record<string, number>;
   settings: GameSettings | null;
-  mrWhiteGuess: string | null;
+  ghostGuess: string | null;
   lastEliminatedId: string | null;
 }
 
@@ -75,7 +75,7 @@ type GameActions = {
   chooseToEliminate: (playerId: string) => void;
   checkWinCondition: () => void;
   eliminatePlayer: (playerId: string) => void;
-  submitMrWhiteGuess: (guess: string) => void;
+  submitGhostGuess: (guess: string) => void;
   nextRound: () => void;
   resetGame: () => void;
   saveToHistory: () => void;
@@ -86,8 +86,8 @@ type GameActions = {
 
 const defaultSettings: GameSettings = {
   playerCount: 6,
-  undercoverCount: 1,
-  mrWhiteEnabled: true,
+  spyCount: 1,
+  ghostEnabled: true,
   timerSeconds: 0,
   wordPackFilter: 'all',
   difficultyFilter: 'any',
@@ -107,7 +107,7 @@ const initialState: GameState = {
   gameHistory: [],
   leaderboard: {},
   settings: null,
-  mrWhiteGuess: null,
+  ghostGuess: null,
   lastEliminatedId: null,
 };
 
@@ -178,8 +178,8 @@ export const useGameStore = create<GameState & GameActions>()(
         if (!wordPair || !settings) return;
         const assignments = doAssignRoles({
           playerCount: players.length,
-          undercoverCount: settings.undercoverCount,
-          mrWhiteEnabled: settings.mrWhiteEnabled,
+          spyCount: settings.spyCount,
+          ghostEnabled: settings.ghostEnabled,
           wordPair,
         });
         const next: Player[] = players.map((p, i) => ({
@@ -268,10 +268,10 @@ export const useGameStore = create<GameState & GameActions>()(
         if (!player) return;
         // Clear so next elimination round shows the newly eliminated player, not this one
         const clearLastEliminated = { lastEliminatedId: null as string | null };
-        if (player.role === 'mrwhite') {
-          // Don't clear lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /mrwhite loads
+        if (player.role === 'ghost') {
+          // Don't clear lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /ghost loads
           set({
-            gamePhase: 'mrwhite',
+            gamePhase: 'ghost',
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             players: state.players.map((p) =>
               p.id === playerId ? { ...p, isEliminated: true } : p
@@ -305,24 +305,24 @@ export const useGameStore = create<GameState & GameActions>()(
         }
       },
 
-      submitMrWhiteGuess(guess: string) {
+      submitGhostGuess(guess: string) {
         const state = get();
         const citizenWord = state.wordPair?.wordA ?? '';
-        const mrWhite = state.players.find((p) => p.role === 'mrwhite');
+        const ghost = state.players.find((p) => p.role === 'ghost');
         const { winner, reason } = resolveWinner(state.players, {
           guess,
           citizenWord,
         });
-        const wonAsMrWhite = winner === 'mrwhite';
+        const wonAsGhost = winner === 'ghost';
         const nextPlayers = state.players.map((p) =>
-          p.id === mrWhite?.id ? { ...p, isEliminated: true } : p
+          p.id === ghost?.id ? { ...p, isEliminated: true } : p
         );
-        if (wonAsMrWhite) {
+        if (wonAsGhost) {
           set({
-            mrWhiteGuess: guess,
+            ghostGuess: guess,
             players: nextPlayers,
             gamePhase: 'ended',
-            winner: 'mrwhite',
+            winner: 'ghost',
             winReason: reason,
           });
           get().saveToHistory();
@@ -330,11 +330,11 @@ export const useGameStore = create<GameState & GameActions>()(
           const afterElim = nextPlayers.filter((p) => !p.isEliminated);
           const { winner: w2, reason: r2 } = resolveWinner(nextPlayers);
           set({
-            mrWhiteGuess: guess,
+            ghostGuess: guess,
             players: nextPlayers,
             gamePhase: w2 ? 'ended' : 'discussion',
             winner: w2 ?? null,
-            winReason: w2 ? r2 : 'Mr. White guessed wrong. Game continues.',
+            winReason: w2 ? r2 : 'Ghost guessed wrong. Game continues.',
             currentRound: w2 ? state.currentRound : state.currentRound + 1,
             currentSpeakerIndex: 0,
           });
@@ -348,14 +348,14 @@ export const useGameStore = create<GameState & GameActions>()(
           set({
             gamePhase: 'ended',
             winner: 'citizens',
-            winReason: 'All Undercover and Mr. White eliminated!',
+            winReason: 'All Spy and Ghost eliminated!',
           });
           get().saveToHistory();
-        } else if (checkUndercoverWin(state.players)) {
+        } else if (checkSpyWin(state.players)) {
           set({
             gamePhase: 'ended',
-            winner: 'undercover',
-            winReason: 'Undercover reached final 2!',
+            winner: 'spy',
+            winReason: 'Spy reached final 2!',
           });
           get().saveToHistory();
         }
@@ -389,8 +389,8 @@ export const useGameStore = create<GameState & GameActions>()(
           const winnerPlayers = state.players.filter(
             (p) =>
               (state.winner === 'citizens' && p.role === 'citizen') ||
-              (state.winner === 'undercover' && p.role === 'undercover') ||
-              (state.winner === 'mrwhite' && p.role === 'mrwhite')
+              (state.winner === 'spy' && p.role === 'spy') ||
+              (state.winner === 'ghost' && p.role === 'ghost')
           );
           winnerPlayers.forEach((p) => addLeaderboardWin(p.name));
           set({
@@ -414,4 +414,4 @@ export const useGameStore = create<GameState & GameActions>()(
   )
 );
 
-export { suggestedUndercoverCount };
+export { suggestedSpyCount };

@@ -12,18 +12,18 @@ const pageVariants = {
   exit: { opacity: 0, y: -20, scale: 0.98 },
 };
 
-export default function MrWhitePage() {
+export default function GhostPage() {
   const router = useRouter();
-  const submitMrWhiteGuess = useGameStore((s) => s.submitMrWhiteGuess);
+  const submitGhostGuess = useGameStore((s) => s.submitGhostGuess);
   const wordPair = useGameStore((s) => s.wordPair);
   const [guess, setGuess] = useState('');
 
   const citizenWord = wordPair?.wordA ?? '';
 
   const handleSubmit = useCallback(() => {
-    submitMrWhiteGuess(guess.trim());
+    submitGhostGuess(guess.trim());
     router.push('/win');
-  }, [guess, submitMrWhiteGuess, router]);
+  }, [guess, submitGhostGuess, router]);
 
   return (
     <motion.div
@@ -34,9 +34,9 @@ export default function MrWhitePage() {
       transition={{ duration: 0.3 }}
       className="mx-auto max-w-md space-y-6"
     >
-      <h1 className="font-display text-2xl font-semibold">Mr. White&apos;s guess</h1>
+      <h1 className="font-display text-2xl font-semibold">Ghost&apos;s guess</h1>
       <p className="font-body text-sm text-[var(--text-secondary)]">
-        You were eliminated as Mr. White. Guess the Citizens&apos; word to win!
+        You were eliminated as Ghost. Guess the Citizens&apos; word to win!
       </p>
       <input
         type="text"

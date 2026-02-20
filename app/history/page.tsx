@@ -13,10 +13,13 @@ const pageVariants = {
   exit: { opacity: 0, y: -20, scale: 0.98 },
 };
 
-const winnerLabels = {
+const winnerLabels: Record<string, string> = {
   citizens: 'Citizens',
-  undercover: 'Undercover',
-  mrwhite: 'Mr. White',
+  spy: 'Spy',
+  ghost: 'Ghost',
+  // backward compatibility for old persisted games
+  undercover: 'Spy',
+  mrwhite: 'Ghost',
 };
 
 export default function HistoryPage() {
@@ -65,7 +68,7 @@ export default function HistoryPage() {
               >
                 <div className="flex justify-between">
                   <span className="font-body font-medium text-[var(--text-primary)]">
-                    {winnerLabels[g.winner]} won
+                    {winnerLabels[g.winner] ?? 'Unknown'} won
                   </span>
                   <span className="font-body text-xs text-[var(--text-secondary)]">
                     {new Date(g.timestamp).toLocaleDateString()}

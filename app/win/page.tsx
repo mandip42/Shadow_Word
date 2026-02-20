@@ -17,8 +17,8 @@ const pageVariants = {
 
 const winnerConfig = {
   citizens: { title: 'Citizens win!', color: 'var(--success)' },
-  undercover: { title: 'Undercover wins!', color: 'var(--danger)' },
-  mrwhite: { title: 'Mr. White wins!', color: 'var(--text-secondary)' },
+  spy: { title: 'Spy wins!', color: 'var(--danger)' },
+  ghost: { title: 'Ghost wins!', color: 'var(--text-secondary)' },
 };
 
 export default function WinPage() {
@@ -54,8 +54,8 @@ export default function WinPage() {
   const winnerPlayers = players.filter(
     (p) =>
       (winner === 'citizens' && p.role === 'citizen') ||
-      (winner === 'undercover' && p.role === 'undercover') ||
-      (winner === 'mrwhite' && p.role === 'mrwhite')
+      (winner === 'spy' && p.role === 'spy') ||
+      (winner === 'ghost' && p.role === 'ghost')
   );
 
   return (

@@ -3,7 +3,7 @@ import { useGameStore } from '@/store/gameStore';
 import {
   getAlivePlayers,
   checkCitizensWin,
-  checkUndercoverWin,
+  checkSpyWin,
 } from '@/utils/winConditions';
 
 export function useGameLogic() {
@@ -14,14 +14,14 @@ export function useGameLogic() {
 
   const citizensWin = useCallback(() => checkCitizensWin(players), [players]);
 
-  const undercoverWin = useCallback(() => checkUndercoverWin(players), [players]);
+  const spyWin = useCallback(() => checkSpyWin(players), [players]);
 
   const isGameOver = gamePhase === 'ended';
 
   return {
     alivePlayers,
     citizensWin,
-    undercoverWin,
+    spyWin,
     isGameOver,
   };
 }

@@ -7,7 +7,7 @@ export interface GameRecord {
   id: string;
   timestamp: number;
   playerCount: number;
-  winner: 'citizens' | 'undercover' | 'mrwhite';
+  winner: 'citizens' | 'spy' | 'ghost';
   winReason: string;
   playerNames: string[];
 }

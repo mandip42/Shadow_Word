@@ -30,9 +30,9 @@ export default function EliminationPage() {
 
   const handleContinue = () => {
     if (!lastEliminatedId || !eliminated) return;
-    // Mr. White: navigate first so this page unmounts before we update store (clearing lastEliminatedId would make this page redirect to /game)
-    if (eliminated.role === 'mrwhite') {
-      router.push('/mrwhite');
+    // Ghost: navigate first so this page unmounts before we update store (clearing lastEliminatedId would make this page redirect to /game)
+    if (eliminated.role === 'ghost') {
+      router.push('/ghost');
       eliminatePlayer(lastEliminatedId);
       return;
     }
@@ -43,9 +43,9 @@ export default function EliminationPage() {
   };
 
   if (!eliminated) {
-    // If we're in mrwhite phase, we're transitioning to guess screen — don't send user to /game
-    if (gamePhase === 'mrwhite') {
-      router.replace('/mrwhite');
+    // If we're in ghost phase, we're transitioning to guess screen — don't send user to /game
+    if (gamePhase === 'ghost') {
+      router.replace('/ghost');
     } else {
       router.replace('/game');
     }
@@ -79,14 +79,14 @@ export default function EliminationPage() {
             Word: {eliminated.word}
           </p>
         )}
-        {eliminated.role === 'mrwhite' && (
+        {eliminated.role === 'ghost' && (
           <p className="mt-3 text-center text-sm text-[var(--text-secondary)]">
             Pass the phone to {eliminated.name} to guess the word!
           </p>
         )}
       </motion.div>
       <Button variant="primary" fullWidth onClick={handleContinue}>
-        {eliminated.role === 'mrwhite' ? 'Guess the word' : 'Continue'}
+        {eliminated.role === 'ghost' ? 'Guess the word' : 'Continue'}
       </Button>
     </motion.div>
   );

@@ -8,7 +8,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useGameStore } from '@/store/gameStore';
-import { suggestedUndercoverCount } from '@/store/gameStore';
+import { suggestedSpyCount } from '@/store/gameStore';
 import type { GameSettings, WordCategoryFilter } from '@/store/gameStore';
 import { WordPackCard } from '@/components/game/WordPackCard';
 
@@ -46,27 +46,27 @@ export default function SetupPage() {
   const router = useRouter();
   const initGame = useGameStore((s) => s.initGame);
   const [playerCount, setPlayerCount] = useState(6);
-  const [undercoverCount, setUndercoverCount] = useState(1);
-  const [mrWhiteEnabled, setMrWhiteEnabled] = useState(true);
+  const [spyCount, setSpyCount] = useState(1);
+  const [ghostEnabled, setGhostEnabled] = useState(true);
   const [timerSeconds, setTimerSeconds] = useState<0 | 30 | 60 | 90>(0);
   const [wordPackFilter, setWordPackFilter] = useState<WordCategoryFilter>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<'easy' | 'medium' | 'hard' | 'any'>('any');
 
-  const suggested = suggestedUndercoverCount(playerCount);
-  const effectiveUndercover = mrWhiteEnabled ? Math.max(1, undercoverCount) : undercoverCount;
+  const suggested = suggestedSpyCount(playerCount);
+  const effectiveSpy = ghostEnabled ? Math.max(1, spyCount) : spyCount;
 
   const handleStart = useCallback(() => {
     const settings: GameSettings = {
       playerCount,
-      undercoverCount: effectiveUndercover,
-      mrWhiteEnabled,
+      spyCount: effectiveSpy,
+      ghostEnabled,
       timerSeconds,
       wordPackFilter,
       difficultyFilter,
     };
     initGame(settings);
     router.push('/players');
-  }, [playerCount, effectiveUndercover, mrWhiteEnabled, timerSeconds, wordPackFilter, difficultyFilter, initGame, router]);
+  }, [playerCount, effectiveSpy, ghostEnabled, timerSeconds, wordPackFilter, difficultyFilter, initGame, router]);
 
   return (
     <motion.div
@@ -99,7 +99,7 @@ export default function SetupPage() {
           onChange={(e) => {
             const n = Number(e.target.value);
             setPlayerCount(n);
-            setUndercoverCount(suggestedUndercoverCount(n));
+            setSpyCount(suggestedSpyCount(n));
           }}
           className="w-full accent-[var(--primary)]"
         />
@@ -110,33 +110,33 @@ export default function SetupPage() {
 
       <Card className="p-4">
         <label className="mb-2 block font-body text-sm font-medium text-[var(--text-secondary)]">
-          Undercover count (suggested: {suggested})
+          Spy count (suggested: {suggested})
         </label>
         <input
           type="range"
           min={1}
           max={Math.min(4, Math.floor(playerCount / 2))}
-          value={undercoverCount}
-          onChange={(e) => setUndercoverCount(Number(e.target.value))}
+          value={spyCount}
+          onChange={(e) => setSpyCount(Number(e.target.value))}
           className="w-full accent-[var(--primary)]"
         />
-        <p className="mt-1 text-center font-body text-lg font-semibold">{undercoverCount}</p>
+        <p className="mt-1 text-center font-body text-lg font-semibold">{spyCount}</p>
       </Card>
 
       <Card className="flex items-center justify-between p-4">
-        <span className="font-body text-[var(--text-primary)]">Mr. White</span>
+        <span className="font-body text-[var(--text-primary)]">Ghost</span>
         <button
           type="button"
           role="switch"
-          aria-checked={mrWhiteEnabled}
-          onClick={() => setMrWhiteEnabled((b) => !b)}
+          aria-checked={ghostEnabled}
+          onClick={() => setGhostEnabled((b) => !b)}
           className={`relative h-8 w-14 rounded-full transition-colors ${
-            mrWhiteEnabled ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'
+            ghostEnabled ? 'bg-[var(--primary)]' : 'bg-[var(--border)]'
           }`}
         >
           <span
             className={`absolute top-1 h-6 w-6 rounded-full bg-white transition-transform ${
-              mrWhiteEnabled ? 'left-7' : 'left-1'
+              ghostEnabled ? 'left-7' : 'left-1'
             }`}
           />
         </button>

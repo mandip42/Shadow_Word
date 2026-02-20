@@ -71,7 +71,7 @@ export default function CustomWordsPage() {
           type="text"
           value={wordB}
           onChange={(e) => setWordB(e.target.value)}
-          placeholder="Word B (Undercover)"
+          placeholder="Word B (Spy)"
           className="min-h-[48px] w-full rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] px-4 font-body text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
         />
         <select

@@ -1,11 +1,11 @@
 import type { WordPair } from '@/data/wordPairs';
 
-export type Role = 'citizen' | 'undercover' | 'mrwhite';
+export type Role = 'citizen' | 'spy' | 'ghost';
 
 export interface AssignmentInput {
   playerCount: number;
-  undercoverCount: number;
-  mrWhiteEnabled: boolean;
+  spyCount: number;
+  ghostEnabled: boolean;
   wordPair: WordPair;
 }
 
@@ -24,29 +24,29 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * Returns one assignment per player index: role and word (or null for Mr. White).
- * Citizens get wordA, Undercover get wordB, Mr. White gets null.
+ * Returns one assignment per player index: role and word (or null for Ghost).
+ * Citizens get wordA, Spy get wordB, Ghost gets null.
  */
 export function assignRoles(input: AssignmentInput): AssignedRole[] {
-  const { playerCount, undercoverCount, mrWhiteEnabled, wordPair } = input;
+  const { playerCount, spyCount, ghostEnabled, wordPair } = input;
   const slots: Role[] = [];
   for (let i = 0; i < playerCount; i++) {
-    if (i < undercoverCount) slots.push('undercover');
-    else if (mrWhiteEnabled && i === undercoverCount) slots.push('mrwhite');
+    if (i < spyCount) slots.push('spy');
+    else if (ghostEnabled && i === spyCount) slots.push('ghost');
     else slots.push('citizen');
   }
   const shuffled = shuffle(slots);
   return shuffled.map((role) => {
     if (role === 'citizen') return { role: 'citizen', word: wordPair.wordA };
-    if (role === 'undercover') return { role: 'undercover', word: wordPair.wordB };
-    return { role: 'mrwhite', word: null };
+    if (role === 'spy') return { role: 'spy', word: wordPair.wordB };
+    return { role: 'ghost', word: null };
   });
 }
 
 /**
- * Suggested undercover count for 2–16 players (inclusive).
+ * Suggested spy count for 2–16 players (inclusive).
  */
-export function suggestedUndercoverCount(playerCount: number): number {
+export function suggestedSpyCount(playerCount: number): number {
   if (playerCount <= 2) return 1;
   if (playerCount <= 4) return 1;
   if (playerCount <= 6) return 1;
