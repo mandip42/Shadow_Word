@@ -8,6 +8,7 @@ import {
   checkCitizensWin,
   checkUndercoverWin,
   resolveWinner,
+  getAlivePlayers,
 } from '@/utils/winConditions';
 import {
   appendGameHistory,
@@ -217,8 +218,10 @@ export const useGameStore = create<GameState & GameActions>()(
       resolveVote() {
         const state = get();
         const votes = state.votes;
+        const alive = getAlivePlayers(state.players);
+        // Only consider alive players — never eliminate someone already out
         const tally: Record<string, number> = {};
-        state.players.forEach((p) => (tally[p.id] = 0));
+        alive.forEach((p) => (tally[p.id] = 0));
         Object.values(votes).forEach((targetId) => {
           if (tally[targetId] !== undefined) tally[targetId]++;
         });
