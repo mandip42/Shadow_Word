@@ -269,9 +269,8 @@ export const useGameStore = create<GameState & GameActions>()(
         // Clear so next elimination round shows the newly eliminated player, not this one
         const clearLastEliminated = { lastEliminatedId: null as string | null };
         if (player.role === 'mrwhite') {
-          // Keep lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /mrwhite loads
+          // Don't clear lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /mrwhite loads
           set({
-            ...clearLastEliminated,
             gamePhase: 'mrwhite',
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             players: state.players.map((p) =>
