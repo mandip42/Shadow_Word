@@ -85,7 +85,7 @@ type GameActions = {
 const defaultSettings: GameSettings = {
   playerCount: 6,
   undercoverCount: 1,
-  mrWhiteEnabled: false,
+  mrWhiteEnabled: true,
   timerSeconds: 0,
   wordPackFilter: 'all',
   difficultyFilter: 'any',
