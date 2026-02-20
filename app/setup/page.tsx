@@ -47,7 +47,7 @@ export default function SetupPage() {
   const initGame = useGameStore((s) => s.initGame);
   const [playerCount, setPlayerCount] = useState(6);
   const [undercoverCount, setUndercoverCount] = useState(1);
-  const [mrWhiteEnabled, setMrWhiteEnabled] = useState(false);
+  const [mrWhiteEnabled, setMrWhiteEnabled] = useState(true);
   const [timerSeconds, setTimerSeconds] = useState<0 | 30 | 60 | 90>(0);
   const [wordPackFilter, setWordPackFilter] = useState<WordCategoryFilter>('all');
   const [difficultyFilter, setDifficultyFilter] = useState<'easy' | 'medium' | 'hard' | 'any'>('any');
