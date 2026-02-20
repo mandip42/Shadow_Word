@@ -1,7 +1,6 @@
 'use client';
 
 import { type HTMLAttributes, forwardRef } from 'react';
-import { motion } from 'framer-motion';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
   glow?: boolean;
@@ -10,7 +9,7 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 export const Card = forwardRef<HTMLDivElement, CardProps>(
   ({ className = '', glow, children, ...props }, ref) => {
     return (
-      <motion.div
+      <div
         ref={ref}
         className={`
           rounded-2xl border border-[var(--border)] bg-[var(--bg-card)]
@@ -22,7 +21,7 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
         {...props}
       >
         {children}
-      </motion.div>
+      </div>
     );
   }
 );
