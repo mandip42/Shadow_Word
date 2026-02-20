@@ -271,6 +271,7 @@ export const useGameStore = create<GameState & GameActions>()(
         if (player.role === 'mrwhite') {
           // Keep lastEliminatedId so elimination page doesn't re-render with null and redirect to /game before /mrwhite loads
           set({
+            ...clearLastEliminated,
             gamePhase: 'mrwhite',
             eliminatedPlayers: [...state.eliminatedPlayers, playerId],
             players: state.players.map((p) =>
