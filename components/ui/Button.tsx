@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 
 type Variant = 'primary' | 'ghost' | 'danger';
 
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+// Omit animation events that conflict with Framer Motion's motion.button types
+interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onAnimationStart' | 'onAnimationEnd'> {
   variant?: Variant;
   fullWidth?: boolean;
 }
