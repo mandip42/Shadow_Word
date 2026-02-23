@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -25,26 +25,39 @@ export default function GamePage() {
   const gamePhase = useGameStore((s) => s.gamePhase);
   const [speakerIndex, setSpeakerIndex] = useState(0);
   const [timerDone, setTimerDone] = useState(false);
+  const lastSpeakerSetup = useRef({ phase: '', round: 0 });
   const { tick } = useSound();
 
   const alive = getAlivePlayers(players);
   const timerSeconds = settings?.timerSeconds ?? 0;
   const currentSpeaker = alive[speakerIndex];
 
-  // Discussion starts from a random player each time; round 1 never starts with Ghost (they have no word)
+  // Discussion starts from a random player each time; round 1 never starts with Ghost (they have no word).
+  // Run only once per (gamePhase, currentRound) so Strict Mode / re-runs don't overwrite with a different random (e.g. 0 = Ghost).
   useEffect(() => {
     if (gamePhase !== 'discussion') return;
+    const key = `${gamePhase}-${currentRound}`;
+    if (lastSpeakerSetup.current.phase === gamePhase && lastSpeakerSetup.current.round === currentRound) return;
+    lastSpeakerSetup.current = { phase: gamePhase, round: currentRound };
+
     setTimerDone(false);
     const currentAlive = getAlivePlayers(useGameStore.getState().players);
     if (currentAlive.length === 0) return;
+
     if (currentRound === 1) {
       const nonGhostIndices = currentAlive
-        .map((p, i) => i)
+        .map((_, i) => i)
         .filter((i) => currentAlive[i].role !== 'ghost');
-      const start = nonGhostIndices.length > 0
-        ? nonGhostIndices[Math.floor(Math.random() * nonGhostIndices.length)]
-        : 0;
-      setSpeakerIndex(start);
+      const start =
+        nonGhostIndices.length > 0
+          ? nonGhostIndices[Math.floor(Math.random() * nonGhostIndices.length)]
+          : 0;
+      // Defensive: never use an index that is Ghost (e.g. if indices got out of sync)
+      const safeStart =
+        currentAlive[start].role === 'ghost'
+          ? nonGhostIndices[0] ?? 0
+          : start;
+      setSpeakerIndex(safeStart);
     } else {
       setSpeakerIndex(Math.floor(Math.random() * currentAlive.length));
     }
