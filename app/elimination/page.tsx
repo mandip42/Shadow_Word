@@ -20,13 +20,18 @@ export default function EliminationPage() {
   const players = useGameStore((s) => s.players);
   const gamePhase = useGameStore((s) => s.gamePhase);
   const eliminatePlayer = useGameStore((s) => s.eliminatePlayer);
-  const { eliminate } = useSound();
+  const { eliminate, ghostEliminate } = useSound();
 
   const eliminated = lastEliminatedId ? players.find((p) => p.id === lastEliminatedId) : null;
 
   useEffect(() => {
-    eliminate();
-  }, [eliminate]);
+    if (!eliminated) return;
+    if (eliminated.role === 'ghost') {
+      ghostEliminate();
+    } else {
+      eliminate();
+    }
+  }, [eliminated, eliminate, ghostEliminate]);
 
   const handleContinue = () => {
     if (!lastEliminatedId || !eliminated) return;

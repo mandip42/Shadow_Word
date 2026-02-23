@@ -69,6 +69,24 @@ export function useSound() {
     }
   }, [soundEnabled, getCtx]);
 
+  const ghostEliminate = useCallback(() => {
+    if (!soundEnabled) return;
+    const ctx = getCtx();
+    if (!ctx) return;
+    try {
+      // Creepy low tone: minor-ish descent with triangle wave
+      const t0 = ctx.currentTime;
+      createOscillator(ctx, 98, 0.5, 'triangle', 0.12);   // G2
+      createOscillator(ctx, 82.5, 0.6, 'triangle', 0.08);  // E2
+      createOscillator(ctx, 73.4, 0.7, 'triangle', 0.06);  // D2
+      // Slight dissonant layer
+      createOscillator(ctx, 110, 0.35, 'sine', 0.04);
+      createOscillator(ctx, 92.5, 0.4, 'sine', 0.03);
+    } catch {
+      // ignore
+    }
+  }, [soundEnabled, getCtx]);
+
   const win = useCallback(() => {
     if (!soundEnabled) return;
     const ctx = getCtx();
@@ -107,5 +125,5 @@ export function useSound() {
     }
   }, [soundEnabled, getCtx]);
 
-  return { cardFlip, vote, eliminate, win, tick, reveal };
+  return { cardFlip, vote, eliminate, ghostEliminate, win, tick, reveal };
 }

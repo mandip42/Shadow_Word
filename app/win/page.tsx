@@ -25,6 +25,8 @@ export default function WinPage() {
   const winner = useGameStore((s) => s.winner);
   const winReason = useGameStore((s) => s.winReason);
   const players = useGameStore((s) => s.players);
+  const wordPair = useGameStore((s) => s.wordPair);
+  const ghostGuess = useGameStore((s) => s.ghostGuess);
   const { win: playWinSound } = useSound();
   const [confetti, setConfetti] = useState(true);
 
@@ -81,6 +83,19 @@ export default function WinPage() {
         <p className="text-center font-body text-[var(--text-secondary)]">
           {winReason}
         </p>
+        {winner === 'ghost' && (wordPair || ghostGuess) && (
+          <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 [backdrop-filter:blur(12px)]">
+            <p className="mb-2 font-body text-sm font-medium text-[var(--text-secondary)]">
+              Words
+            </p>
+            <p className="font-body text-[var(--text-primary)]">
+              Correct word: <strong className="text-[var(--primary-light)]">{wordPair?.wordA ?? '—'}</strong>
+            </p>
+            <p className="mt-1 font-body text-[var(--text-primary)]">
+              Ghost guessed: <strong className="text-[var(--text-secondary)]">{ghostGuess ?? '—'}</strong>
+            </p>
+          </div>
+        )}
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 [backdrop-filter:blur(12px)]">
           <p className="mb-2 font-body text-sm font-medium text-[var(--text-secondary)]">
             Winners

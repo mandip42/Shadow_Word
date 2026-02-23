@@ -9,6 +9,7 @@ export interface SettingsState {
   hapticsEnabled: boolean;
   onboardingDone: boolean;
   installPromptDismissed: boolean;
+  lastPlayerNames: string[];
 }
 
 export interface SettingsActions {
@@ -17,6 +18,7 @@ export interface SettingsActions {
   setHapticsEnabled: (enabled: boolean) => void;
   setOnboardingDone: (done: boolean) => void;
   setInstallPromptDismissed: (dismissed: boolean) => void;
+  setLastPlayerNames: (names: string[]) => void;
 }
 
 const initialState: SettingsState = {
@@ -25,6 +27,7 @@ const initialState: SettingsState = {
   hapticsEnabled: true,
   onboardingDone: false,
   installPromptDismissed: false,
+  lastPlayerNames: [],
 };
 
 export const useSettingsStore = create<SettingsState & SettingsActions>()(
@@ -49,6 +52,9 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
       setInstallPromptDismissed(installPromptDismissed) {
         set({ installPromptDismissed });
       },
+      setLastPlayerNames(lastPlayerNames) {
+        set({ lastPlayerNames });
+      },
     }),
     {
       name: 'shadow-word-settings',
@@ -58,6 +64,7 @@ export const useSettingsStore = create<SettingsState & SettingsActions>()(
         hapticsEnabled: s.hapticsEnabled,
         onboardingDone: s.onboardingDone,
         installPromptDismissed: s.installPromptDismissed,
+        lastPlayerNames: s.lastPlayerNames,
       }),
     }
   )

@@ -32,6 +32,14 @@ export function checkSpyWin(players: Player[]): boolean {
   return false;
 }
 
+function normalizeWord(w: string): string {
+  return w
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .normalize('NFC');
+}
+
 export function checkGhostWin(
   players: Player[],
   eliminatedPlayerId: string,
@@ -40,7 +48,7 @@ export function checkGhostWin(
 ): boolean {
   const eliminated = players.find((p) => p.id === eliminatedPlayerId);
   if (!eliminated || eliminated.role !== 'ghost') return false;
-  return guess.trim().toLowerCase() === citizenWord.toLowerCase();
+  return normalizeWord(guess) === normalizeWord(citizenWord);
 }
 
 export type WinnerKind = 'citizens' | 'spy' | 'ghost' | null;

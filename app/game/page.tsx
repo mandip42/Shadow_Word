@@ -31,16 +31,22 @@ export default function GamePage() {
   const timerSeconds = settings?.timerSeconds ?? 0;
   const currentSpeaker = alive[speakerIndex];
 
-  // Round 1: Ghost must not be first to speak (they have no word to give a clue)
+  // Discussion starts from a random player each time; round 1 never starts with Ghost (they have no word)
   useEffect(() => {
     if (gamePhase !== 'discussion') return;
     setTimerDone(false);
+    const currentAlive = getAlivePlayers(useGameStore.getState().players);
+    if (currentAlive.length === 0) return;
     if (currentRound === 1) {
-      const currentAlive = getAlivePlayers(useGameStore.getState().players);
-      const firstNonGhost = currentAlive.findIndex((p) => p.role !== 'ghost');
-      setSpeakerIndex(firstNonGhost >= 0 ? firstNonGhost : 0);
+      const nonGhostIndices = currentAlive
+        .map((p, i) => i)
+        .filter((i) => currentAlive[i].role !== 'ghost');
+      const start = nonGhostIndices.length > 0
+        ? nonGhostIndices[Math.floor(Math.random() * nonGhostIndices.length)]
+        : 0;
+      setSpeakerIndex(start);
     } else {
-      setSpeakerIndex(0);
+      setSpeakerIndex(Math.floor(Math.random() * currentAlive.length));
     }
   }, [gamePhase, currentRound]);
 

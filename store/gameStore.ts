@@ -42,6 +42,7 @@ export interface GameState {
   players: Player[];
   wordPair: WordPair | null;
   currentRevealIndex: number;
+  revealStartIndex: number;
   currentRound: number;
   currentSpeakerIndex: number;
   votes: Record<string, string>;
@@ -97,6 +98,7 @@ const initialState: GameState = {
   players: [],
   wordPair: null,
   currentRevealIndex: 0,
+  revealStartIndex: 0,
   currentRound: 1,
   currentSpeakerIndex: 0,
   votes: {},
@@ -187,9 +189,11 @@ export const useGameStore = create<GameState & GameActions>()(
           role: assignments[i].role,
           word: assignments[i].word,
         }));
+        const n = next.length;
         set({
           players: next,
           currentRevealIndex: 0,
+          revealStartIndex: n > 0 ? Math.floor(Math.random() * n) : 0,
           currentRound: 1,
           currentSpeakerIndex: 0,
           gamePhase: 'reveal',

@@ -17,10 +17,13 @@ export default function RevealPage() {
   const router = useRouter();
   const players = useGameStore((s) => s.players);
   const currentRevealIndex = useGameStore((s) => s.currentRevealIndex);
+  const revealStartIndex = useGameStore((s) => s.revealStartIndex);
   const advanceReveal = useGameStore((s) => s.advanceReveal);
 
-  const currentPlayer = players[currentRevealIndex];
-  const isLast = currentRevealIndex >= players.length - 1;
+  const n = players.length;
+  const currentPlayerIndex = n > 0 ? (revealStartIndex + currentRevealIndex) % n : 0;
+  const currentPlayer = players[currentPlayerIndex];
+  const isLast = currentRevealIndex >= n - 1;
 
   const handleSeen = useCallback(() => {
     if (isLast) {
@@ -51,7 +54,7 @@ export default function RevealPage() {
         <RoleRevealCard key={currentPlayer.id} player={currentPlayer} onSeen={handleSeen} autoHideSeconds={4} />
       </div>
       <p className="text-center font-body text-sm text-[var(--text-secondary)]">
-        {currentRevealIndex + 1} of {players.length}
+        {currentRevealIndex + 1} of {n}
       </p>
     </motion.div>
   );

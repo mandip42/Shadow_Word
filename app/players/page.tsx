@@ -4,10 +4,11 @@ import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useGameStore } from '@/store/gameStore';
+import { useSettingsStore } from '@/store/settingsStore';
 
 const SUGGESTED_NAMES = ['Harry', 'Hermione', 'Ron', 'Draco', 'Luna', 'Neville', 'Ginny', 'Fred', 'George', 'Sirius', 'Dumbledore', 'Snape', 'McGonagall', 'Hagrid', 'Dobby', 'Voldemort'];
 
@@ -22,11 +23,23 @@ export default function PlayersPage() {
   const settings = useGameStore((s) => s.settings);
   const setPlayers = useGameStore((s) => s.setPlayers);
   const assignRoles = useGameStore((s) => s.assignRoles);
+  const lastPlayerNames = useSettingsStore((s) => s.lastPlayerNames);
+  const setLastPlayerNames = useSettingsStore((s) => s.setLastPlayerNames);
 
   const count = settings?.playerCount ?? 6;
-  const [names, setNames] = useState<string[]>(() =>
-    Array.from({ length: count }, (_, i) => SUGGESTED_NAMES[i % SUGGESTED_NAMES.length] ?? `Player ${i + 1}`)
-  );
+  const [names, setNames] = useState<string[]>(() => {
+    if (lastPlayerNames?.length >= count) {
+      return lastPlayerNames.slice(0, count);
+    }
+    if (lastPlayerNames?.length) {
+      const base = [...lastPlayerNames];
+      while (base.length < count) {
+        base.push(SUGGESTED_NAMES[base.length % SUGGESTED_NAMES.length] ?? `Player ${base.length + 1}`);
+      }
+      return base.slice(0, count);
+    }
+    return Array.from({ length: count }, (_, i) => SUGGESTED_NAMES[i % SUGGESTED_NAMES.length] ?? `Player ${i + 1}`);
+  });
 
   const updateName = useCallback((index: number, value: string) => {
     setNames((prev) => {
@@ -45,6 +58,24 @@ export default function PlayersPage() {
     setNames((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const moveUp = useCallback((index: number) => {
+    if (index <= 0) return;
+    setNames((prev) => {
+      const next = [...prev];
+      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      return next;
+    });
+  }, []);
+
+  const moveDown = useCallback((index: number) => {
+    setNames((prev) => {
+      if (index >= prev.length - 1) return prev;
+      const next = [...prev];
+      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      return next;
+    });
+  }, []);
+
   const randomize = useCallback(() => {
     setNames((prev) =>
       prev.map(() => SUGGESTED_NAMES[Math.floor(Math.random() * SUGGESTED_NAMES.length)])
@@ -54,10 +85,11 @@ export default function PlayersPage() {
   const handleStart = useCallback(() => {
     const trimmed = names.slice(0, count).map((n) => n.trim() || 'Player');
     const final = trimmed.length >= 2 ? trimmed : [...trimmed, 'Player 2'];
+    setLastPlayerNames(final);
     setPlayers(final);
     assignRoles();
     router.push('/reveal');
-  }, [names, count, setPlayers, assignRoles, router]);
+  }, [names, count, setLastPlayerNames, setPlayers, assignRoles, router]);
 
   return (
     <motion.div
@@ -89,8 +121,28 @@ export default function PlayersPage() {
             <motion.li
               key={i}
               layout
-              className="flex items-center gap-2"
+              className="flex items-center gap-1"
             >
+              <div className="flex flex-col gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => moveUp(i)}
+                  disabled={i === 0}
+                  className="flex min-h-[22px] min-w-[36px] items-center justify-center rounded text-[var(--text-secondary)] hover:bg-[var(--bg-card)] disabled:opacity-30"
+                  aria-label="Move up"
+                >
+                  <ChevronUp size={18} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveDown(i)}
+                  disabled={i >= names.length - 1}
+                  className="flex min-h-[22px] min-w-[36px] items-center justify-center rounded text-[var(--text-secondary)] hover:bg-[var(--bg-card)] disabled:opacity-30"
+                  aria-label="Move down"
+                >
+                  <ChevronDown size={18} />
+                </button>
+              </div>
               <input
                 type="text"
                 value={name}
