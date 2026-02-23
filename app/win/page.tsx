@@ -83,7 +83,8 @@ export default function WinPage() {
         <p className="text-center font-body text-[var(--text-secondary)]">
           {winReason}
         </p>
-        {winner === 'ghost' && (wordPair || ghostGuess) && (
+        {/* Reveal correct word and Ghost's guess when Ghost won, or when Citizens won and the Ghost had a turn to guess */}
+        {(wordPair || ghostGuess) && (winner === 'ghost' || winner === 'citizens') && (
           <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg-card)] p-4 [backdrop-filter:blur(12px)]">
             <p className="mb-2 font-body text-sm font-medium text-[var(--text-secondary)]">
               Words
